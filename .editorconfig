@@ -1,0 +1,69 @@
+# To learn more about .editorconfig see https://aka.ms/editorconfigdocs
+############################### 
+# Core EditorConfig Options   # 
+############################### 
+# All files 
+[*]
+indent_style=tab
+trim_trailing_whitespace=true
+
+# VSSPELL: Spell checker settings from arscis.station.sln.vsspell
+vsspell_section_id = 3625f4cfe06141e088544f8ba4d98b9f
+vsspell_code_analyzer_ignore_verbatim_strings = true
+vsspell_additional_dictionary_folders_3625f4cfe06141e088544f8ba4d98b9f = .\dictionaries
+vsspell_ignored_words_3625f4cfe06141e088544f8ba4d98b9f = File:dictionaries\.ignored.dic
+vsspell_dictionary_languages_3625f4cfe06141e088544f8ba4d98b9f = ru-RU,en-US
+
+[*.{json}]
+indent_style=space
+indent_size=2
+tab_width=2
+
+# XML end etc...
+[*.{xml,xsd,appxmanifest,manifest,build,config,csproj,dbml,discomap,dtd,jsproj,lsproj,njsproj,nuspec,proj,props,StyleCop,targets,tasks,vbproj}]
+indent_style=space
+indent_size=2
+tab_width=2
+
+[*.{html,cshtml,css}]
+indent_style=space
+indent_size=4
+tab_width=4
+
+[*.{xaml,xamlx,xoml}]
+indent_style=space
+indent_size=4
+tab_width=4
+
+# Code files 
+[*.{razor}]
+indent_style=space
+indent_size=4
+tab_width=4
+insert_final_newline=true
+charset=utf-8-bom
+end_of_line=crlf
+
+[*.{cs,csx,vb,vbx}]
+indent_style=tab
+indent_size=4
+insert_final_newline=true
+charset=utf-8-bom
+end_of_line=crlf
+
+
+#### .NET Coding Conventions ####
+
+# Organize usings
+dotnet_separate_import_directive_groups = true
+dotnet_sort_system_directives_first = true
+
+# Space preferences
+csharp_space_after_keywords_in_control_flow_statements = false
+csharp_style_namespace_declarations=file_scoped:silent
+
+[*/shared/external/*.cs]
+# VSSPELL: Ignored file pattern from arscis.station.sln.vsspell
+vsspell_spell_check_as_you_type = false
+vsspell_include_in_project_spell_check = false
+
