@@ -9,6 +9,10 @@ public enum Direction2D { Left, Up, Right, Down }
 public static class Direction2DExtensions
 {
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Direction2D Reverse(this Direction2D direction)
+		=> (Direction2D)(((int)direction + 2) % 4);
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Direction2D RotateCW(this Direction2D direction)
 		=> (Direction2D)(((int)direction + 1) % 4);
 

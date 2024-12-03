@@ -15,6 +15,26 @@ public static class Mathematics
 		where T : IComparisonOperators<T, T, bool>
 		=> a <= b ? (a, b) : (b, a);
 
+	public static int SolveQuadraticEquation<TIn, TOut>(TIn a, TIn b, TIn c, out TOut x1, out TOut x2)
+		where TIn  : INumber<TIn>
+		where TOut : INumber<TOut>, IRootFunctions<TOut>
+	{
+		var ac = a * c;
+		var D  = b * b - (ac + ac + ac + ac);
+		if(TIn.IsNegative(D))
+		{
+			x1 = default!;
+			x2 = default!;
+			return 0;
+		}
+		var sqrt = TOut.Sqrt(TOut.CreateChecked(D));
+		var aa   = TOut.CreateChecked(a + a);
+		var vb   = TOut.CreateChecked(-b);
+		x1 = (vb + sqrt) / aa;
+		x2 = (vb - sqrt) / aa;
+		return TIn.IsZero(D) ? 1 : 2;
+	}
+
 	public static T GCD<T>(T a, T b)
 		where T : INumber<T>
 	{

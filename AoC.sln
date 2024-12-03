@@ -642,6 +642,72 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "2017day03", "2017\day03\201
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "2017day04", "2017\day04\2017day04.csproj", "{CBAE88FC-2A20-4625-848B-523726559AED}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2024", "2024", "{827DD98A-29D4-45FD-AA52-49BF146BDA8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2024day02", "2024\day01\2024day02.csproj", "{23D984A5-87D9-45F9-B0D0-5C840AF7782A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "inputs", "inputs", "{77E346AF-5E79-43F3-9AE6-168E53D662EC}"
+	ProjectSection(SolutionItems) = preProject
+		2024\inputs\day01.txt = 2024\inputs\day01.txt
+		2024\inputs\day02.txt = 2024\inputs\day02.txt
+		2024\inputs\day03.txt = 2024\inputs\day03.txt
+		2024\inputs\day04.txt = 2024\inputs\day04.txt
+		2024\inputs\day05.txt = 2024\inputs\day05.txt
+		2024\inputs\day06.txt = 2024\inputs\day06.txt
+		2024\inputs\day07.txt = 2024\inputs\day07.txt
+		2024\inputs\day08.txt = 2024\inputs\day08.txt
+		2024\inputs\day09.txt = 2024\inputs\day09.txt
+		2024\inputs\day10.txt = 2024\inputs\day10.txt
+		2024\inputs\day11.txt = 2024\inputs\day11.txt
+		2024\inputs\day12.txt = 2024\inputs\day12.txt
+		2024\inputs\day13.txt = 2024\inputs\day13.txt
+		2024\inputs\day14.txt = 2024\inputs\day14.txt
+		2024\inputs\day15.txt = 2024\inputs\day15.txt
+		2024\inputs\day16.txt = 2024\inputs\day16.txt
+		2024\inputs\day17.txt = 2024\inputs\day17.txt
+		2024\inputs\day18.txt = 2024\inputs\day18.txt
+		2024\inputs\day19.txt = 2024\inputs\day19.txt
+		2024\inputs\day20.txt = 2024\inputs\day20.txt
+		2024\inputs\day21.txt = 2024\inputs\day21.txt
+		2024\inputs\day22.txt = 2024\inputs\day22.txt
+		2024\inputs\day23.txt = 2024\inputs\day23.txt
+		2024\inputs\day24.txt = 2024\inputs\day24.txt
+		2024\inputs\day25.txt = 2024\inputs\day25.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "outputs", "outputs", "{527337C6-38BA-427F-8361-E109521443BC}"
+	ProjectSection(SolutionItems) = preProject
+		2024\outputs\day01.txt = 2024\outputs\day01.txt
+		2024\outputs\day02.txt = 2024\outputs\day02.txt
+		2024\outputs\day03.txt = 2024\outputs\day03.txt
+		2024\outputs\day04.txt = 2024\outputs\day04.txt
+		2024\outputs\day05.txt = 2024\outputs\day05.txt
+		2024\outputs\day06.txt = 2024\outputs\day06.txt
+		2024\outputs\day07.txt = 2024\outputs\day07.txt
+		2024\outputs\day08.txt = 2024\outputs\day08.txt
+		2024\outputs\day09.txt = 2024\outputs\day09.txt
+		2024\outputs\day10.txt = 2024\outputs\day10.txt
+		2024\outputs\day11.txt = 2024\outputs\day11.txt
+		2024\outputs\day12.txt = 2024\outputs\day12.txt
+		2024\outputs\day13.txt = 2024\outputs\day13.txt
+		2024\outputs\day14.txt = 2024\outputs\day14.txt
+		2024\outputs\day15.txt = 2024\outputs\day15.txt
+		2024\outputs\day16.txt = 2024\outputs\day16.txt
+		2024\outputs\day17.txt = 2024\outputs\day17.txt
+		2024\outputs\day18.txt = 2024\outputs\day18.txt
+		2024\outputs\day19.txt = 2024\outputs\day19.txt
+		2024\outputs\day20.txt = 2024\outputs\day20.txt
+		2024\outputs\day21.txt = 2024\outputs\day21.txt
+		2024\outputs\day22.txt = 2024\outputs\day22.txt
+		2024\outputs\day23.txt = 2024\outputs\day23.txt
+		2024\outputs\day24.txt = 2024\outputs\day24.txt
+		2024\outputs\day25.txt = 2024\outputs\day25.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2024day01", "2024\day02\2024day01.csproj", "{FEB13C29-1542-46C7-900D-36BC2CD30EBA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2024day03", "2024\day03\2024day03.csproj", "{90ECC57A-596E-46C8-8B4C-C51D690B3260}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1068,6 +1134,18 @@ Global
 		{CBAE88FC-2A20-4625-848B-523726559AED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBAE88FC-2A20-4625-848B-523726559AED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBAE88FC-2A20-4625-848B-523726559AED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23D984A5-87D9-45F9-B0D0-5C840AF7782A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23D984A5-87D9-45F9-B0D0-5C840AF7782A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23D984A5-87D9-45F9-B0D0-5C840AF7782A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23D984A5-87D9-45F9-B0D0-5C840AF7782A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEB13C29-1542-46C7-900D-36BC2CD30EBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEB13C29-1542-46C7-900D-36BC2CD30EBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEB13C29-1542-46C7-900D-36BC2CD30EBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEB13C29-1542-46C7-900D-36BC2CD30EBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90ECC57A-596E-46C8-8B4C-C51D690B3260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90ECC57A-596E-46C8-8B4C-C51D690B3260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90ECC57A-596E-46C8-8B4C-C51D690B3260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90ECC57A-596E-46C8-8B4C-C51D690B3260}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1192,6 +1270,11 @@ Global
 		{7E3752A6-5144-44E3-9F6F-8E8FB105ACC8} = {674175B2-A6B9-49E2-9799-3E9FF990A4DC}
 		{9398CC07-457A-4502-8D44-F7C5D739EDE9} = {674175B2-A6B9-49E2-9799-3E9FF990A4DC}
 		{CBAE88FC-2A20-4625-848B-523726559AED} = {674175B2-A6B9-49E2-9799-3E9FF990A4DC}
+		{23D984A5-87D9-45F9-B0D0-5C840AF7782A} = {827DD98A-29D4-45FD-AA52-49BF146BDA8E}
+		{77E346AF-5E79-43F3-9AE6-168E53D662EC} = {827DD98A-29D4-45FD-AA52-49BF146BDA8E}
+		{527337C6-38BA-427F-8361-E109521443BC} = {827DD98A-29D4-45FD-AA52-49BF146BDA8E}
+		{FEB13C29-1542-46C7-900D-36BC2CD30EBA} = {827DD98A-29D4-45FD-AA52-49BF146BDA8E}
+		{90ECC57A-596E-46C8-8B4C-C51D690B3260} = {827DD98A-29D4-45FD-AA52-49BF146BDA8E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BA0BC3D2-D182-4CCD-BFAF-925580F88C53}
