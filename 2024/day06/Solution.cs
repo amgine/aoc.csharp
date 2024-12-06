@@ -4,9 +4,6 @@
 [Name(@"Guard Gallivant")]
 public abstract class Day06Solution : Solution
 {
-	protected static bool IsInside<T>(T[,] map, Point2D p)
-		=> p.X >= 0 && p.Y >= 0 && p.X < map.GetLength(1) && p.Y < map.GetLength(0);
-
 	protected static Point2D FindStartingPosition(char[,] map)
 	{
 		for(int y = 0; y < map.GetLength(0); ++y)
@@ -27,29 +24,21 @@ public abstract class Day06Solution : Solution
 	{
 		var visited = new HashSet<Point2D>();
 		var direction = Direction2D.Up;
+		var v = Vector2D.FromDirection(direction);
+		visited.Add(p);
 		while(true)
 		{
-			var v = Vector2D.FromDirection(direction);
-			var leftTheMap = true;
-			while(p.X >= 0 && p.Y >= 0 && p.X < map.GetLength(1) && p.Y < map.GetLength(0))
+			var next = p + v;
+			if(!next.IsInside(map)) return visited;
+			if(next.GetValue(map) == '#')
 			{
-				if(map[p.Y, p.X] == '#')
-				{
-					p -= v;
-					direction = direction.RotateCW();
-					v = Vector2D.FromDirection(direction);
-					leftTheMap = false;
-					break;
-				}
-				visited.Add(p);
-				p += v;
+				direction = direction.RotateCW();
+				v = Vector2D.FromDirection(direction);
+				continue;
 			}
-			if(leftTheMap)
-			{
-				break;
-			}
+			p = next;
+			visited.Add(p);
 		}
-		return visited;
 	}
 
 	public sealed override string Process(TextReader reader)
@@ -70,62 +59,42 @@ public sealed class Day06SolutionPart1 : Day06Solution
 
 public sealed class Day06SolutionPart2 : Day06Solution
 {
-	static bool CheckLoop(char[,] map, Point2D p, Direction2D d)
+	static bool IsLoop(char[,] map, Point2D start, Point2D obstacle, Direction2D direction)
 	{
-		var visited = new Dictionary<Point2D, int>();
+		var visited = new HashSet<(Point2D, Direction2D)>();
+		var p = start;
+		var v = Vector2D.FromDirection(direction);
 		while(true)
 		{
-			var leftTheMap = true;
-			var started = false;
-			var v = Vector2D.FromDirection(d);
-			while(IsInside(map, p))
+			var next = p + v;
+			if(!next.IsInside(map)) return false;
+			if(next.GetValue(map) == '#' || next == obstacle)
 			{
-				if(map[p.Y, p.X] == '#')
+				if(!visited.Add((next, direction)))
 				{
-					p -= v;
-					d = d.RotateCW();
-					leftTheMap = false;
-					break;
+					return true;
 				}
-				if(started)
-				{
-					if(visited.TryGetValue(p, out var flags))
-					{
-						var f = flags | (1 << (int)d);
-						if(flags == f) return true;
-						visited[p] = f;
-					}
-					else
-					{
-						visited.Add(p, 1 << (int)d);
-					}
-				}
-				else started = true;
-				p += v;
+				direction = direction.RotateCW();
+				v = Vector2D.FromDirection(direction);
+				continue;
 			}
-			if(leftTheMap) return false;
+			p = next;
 		}
 	}
 
 	protected override int Solve(char[,] map, Point2D start)
 	{
 		var count = 0;
-		foreach(var p in Visit(map, start))
-		{
-			if(p == start) continue;
-			map[p.Y, p.X] = '#';
-			try
+		var visits = Visit(map, start);
+		visits.Remove(start);
+		Parallel.ForEach(visits,
+			p =>
 			{
-				if(CheckLoop(map, start, Direction2D.Up))
+				if(IsLoop(map, start, p, Direction2D.Up))
 				{
-					++count;
+					Interlocked.Increment(ref count);
 				}
-			}
-			finally
-			{
-				map[p.Y, p.X] = '.';
-			}
-		}
+			});
 		return count;
 	}
 }
