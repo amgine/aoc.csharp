@@ -2,7 +2,7 @@
 namespace AoC.Year2024;
 
 /// <remarks><a href="https://adventofcode.com/2024/day/5"/></remarks>
-[Name(@"XXX")]
+[Name(@"Print Queue")]
 public abstract class Day05Solution : Solution
 {
 	protected readonly record struct Dependency(int Page, int Before);
