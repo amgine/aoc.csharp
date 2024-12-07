@@ -4,9 +4,6 @@
 [Name(@"Ceres Search")]
 public abstract class Day04Solution : Solution
 {
-	protected static bool IsInside<T>(T[,] map, int y, int x)
-		=> x >= 0 && y >= 0 && x < map.GetLength(1) && y < map.GetLength(0);
-
 	protected abstract int Solve(char[,] map);
 
 	public sealed override string Process(TextReader reader)
@@ -32,8 +29,8 @@ public sealed class Day04SolutionPart1 : Day04Solution
 	{
 		for(int i = 0; i < Phrase.Length; ++i)
 		{
-			if(!IsInside(map, p.Y, p.X))   return false;
-			if(map[p.Y, p.X] != Phrase[i]) return false;
+			if(!p.IsInside(map)) return false;
+			if(p.GetValue(map) != Phrase[i]) return false;
 			p += offset;
 		}
 		return true;
