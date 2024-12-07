@@ -24,24 +24,17 @@ public abstract class Day07Solution(int operatorsCount) : Solution
 		Concat,
 	}
 
-	static long Concat(long a, long b)
+	public static long Concat(long a, long b)
 	{
-		var d = 1L;
 		var x = b;
 		x /= 10;
+		a *= 10;
 		while(x != 0)
 		{
-			d *= 10;
 			x /= 10;
+			a *= 10;
 		}
-		while(d != 0)
-		{
-			var digit = b / d;
-			b -= digit * d;
-			d /= 10;
-			a = a * 10 + digit;
-		}
-		return a;
+		return a + b;
 	}
 
 	static long Calc(long a, long b, Operator op)

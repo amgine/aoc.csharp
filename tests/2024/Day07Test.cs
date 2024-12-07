@@ -19,6 +19,13 @@ class Day07Test
 		""";
 
 	[Test]
+	[TestCase(10, 0, ExpectedResult = 100)]
+	[TestCase(10, 10, ExpectedResult = 1010)]
+	[TestCase(12, 54, ExpectedResult = 1254)]
+	[TestCase(0, 1, ExpectedResult = 1)]
+	public long Concat(long a, long b) => Day07Solution.Concat(a, b);
+
+	[Test]
 	public void SolvePart1() => Helper.ValidateSolution<Day07SolutionPart1>(
 		expected: "3749", input: SampleInput1);
 
