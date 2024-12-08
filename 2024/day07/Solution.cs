@@ -4,6 +4,13 @@
 [Name(@"Bridge Repair")]
 public abstract class Day07Solution(int operatorsCount) : Solution
 {
+	enum Operator : byte
+	{
+		Add,
+		Multiply,
+		Concat,
+	}
+
 	readonly record struct Equation(long Result, long[] Args)
 	{
 		public static Equation Parse(string line)
@@ -15,13 +22,28 @@ public abstract class Day07Solution(int operatorsCount) : Solution
 				long.Parse);
 			return new Equation(result, args);
 		}
-	}
 
-	enum Operator
-	{
-		Add,
-		Multiply,
-		Concat,
+		public bool IsValidWith(ReadOnlySpan<Operator> ops)
+			=> Calc(ops) == Result;
+
+		public long Calc(ReadOnlySpan<Operator> ops)
+		{
+			long aggregated = Args[0];
+			for(int i = 0; i < ops.Length; ++i)
+			{
+				aggregated = Exec(ops[i], aggregated, Args[i + 1]);
+			}
+			return aggregated;
+		}
+
+		static long Exec(Operator op, long a, long b)
+			=> op switch
+			{
+				Operator.Add      => a + b,
+				Operator.Multiply => a * b,
+				Operator.Concat   => Concat(a, b),
+				_ => throw new ArgumentException($"Unknown operator: {op}", nameof(op)),
+			};
 	}
 
 	public static long Concat(long a, long b)
@@ -37,32 +59,13 @@ public abstract class Day07Solution(int operatorsCount) : Solution
 		return a + b;
 	}
 
-	static long Calc(long a, long b, Operator op)
-		=> op switch
-		{
-			Operator.Add      => a + b,
-			Operator.Multiply => a * b,
-			Operator.Concat   => Concat(a, b),
-			_ => throw new ArgumentException($"Unknown operator: {op}", nameof(op)),
-		};
-
-	static long Calc(long[] args, ReadOnlySpan<Operator> ops)
+	static bool Next(Span<Operator> expression, int count)
 	{
-		long aggregated = args[0];
-		for(int i = 0; i < ops.Length; ++i)
+		for(int i = 0; i < expression.Length; ++i)
 		{
-			aggregated = Calc(aggregated, args[i + 1], ops[i]);
-		}
-		return aggregated;
-	}
-
-	static bool Next(Span<Operator> ops, int count)
-	{
-		for(int i = 0; i < ops.Length; ++i)
-		{
-			++ops[i];
-			if(ops[i] < (Operator)count) return true;
-			ops[i] = default;
+			++expression[i];
+			if(expression[i] < (Operator)count) return true;
+			expression[i] = default;
 		}
 		return false;
 	}
@@ -72,18 +75,20 @@ public abstract class Day07Solution(int operatorsCount) : Solution
 		Span<Operator> ops = stackalloc Operator[eq.Args.Length - 1];
 		do
 		{
-			if(Calc(eq.Args, ops) == eq.Result) return true;
+			if(eq.IsValidWith(ops)) return true;
 		}
 		while(Next(ops, operatorsCount));
 		return false;
 	}
 
 	public sealed override string Process(TextReader reader)
-		=> SumFromNonEmptyLines(reader, line =>
-		{
-			var eq = Equation.Parse(line);
-			return CanSolve(eq) ? eq.Result : 0;
-		}).ToString();
+	{
+		var sum = 0L;
+		Parallel.ForEach(
+			LoadListFromNonEmptyStrings(reader, Equation.Parse),
+			eq => { if(CanSolve(eq)) Interlocked.Add(ref sum, eq.Result); });
+		return sum.ToString();
+	}
 }
 
 public sealed class Day07SolutionPart1 : Day07Solution
