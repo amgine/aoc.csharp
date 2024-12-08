@@ -20,12 +20,12 @@ public abstract class Day06Solution : Solution
 		throw new InvalidDataException();
 	}
 
-	protected static HashSet<Point2D> Visit(char[,] map, Point2D p)
+	protected static Dictionary<Point2D, Direction2D> Visit(char[,] map, Point2D p)
 	{
-		var visited = new HashSet<Point2D>();
+		var visited = new Dictionary<Point2D, Direction2D>();
 		var direction = Direction2D.Up;
 		var v = Vector2D.FromDirection(direction);
-		visited.Add(p);
+		visited.Add(p, direction);
 		while(true)
 		{
 			var next = p + v;
@@ -37,7 +37,7 @@ public abstract class Day06Solution : Solution
 				continue;
 			}
 			p = next;
-			visited.Add(p);
+			visited.TryAdd(p, direction);
 		}
 	}
 
@@ -90,7 +90,10 @@ public sealed class Day06SolutionPart2 : Day06Solution
 		Parallel.ForEach(visits,
 			p =>
 			{
-				if(IsLoop(map, start, p, Direction2D.Up))
+				var o = p.Key;
+				var d = p.Value;
+				var s = o - Vector2D.FromDirection(d);
+				if(IsLoop(map, s, o, d))
 				{
 					Interlocked.Increment(ref count);
 				}
