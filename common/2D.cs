@@ -196,6 +196,13 @@ public readonly record struct Point2D(int X, int Y)
 		&& Y < map.GetLength(0);
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public bool IsInside(Rectangle2D bounds)
+		=> X >= bounds.Position.X
+		&& Y >= bounds.Position.Y
+		&& X <  bounds.Position.X + bounds.Size.Width
+		&& Y <  bounds.Position.Y + bounds.Size.Height;
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Point2D operator +(Point2D position, Vector2D offset)
 		=> new(position.X + offset.DeltaX, position.Y + offset.DeltaY);
 
