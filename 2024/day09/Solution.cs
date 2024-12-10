@@ -4,7 +4,7 @@
 [Name(@"Disk Fragmenter")]
 public abstract class Day09Solution : Solution
 {
-	protected readonly record struct Entry(int? FileId = default, int Length = 0);
+	protected readonly record struct Entry(int? FileId, int Length);
 
 	static LinkedList<Entry> ParseInput(string line)
 	{
@@ -20,9 +20,9 @@ public abstract class Day09Solution : Solution
 			}
 			else
 			{
-				if(entries.Last is { Value: { FileId: null } e})
+				if(entries.Last is { Value: { FileId: null } e} last)
 				{
-					entries.Last.Value = new(null, e.Length + len);
+					last.Value = new(null, e.Length + len);
 				}
 				else
 				{
@@ -39,50 +39,18 @@ public abstract class Day09Solution : Solution
 
 	protected abstract void Defragment(LinkedList<Entry> entries);
 
-	protected static void FreeSpace(LinkedList<Entry> entries, LinkedListNode<Entry> node)
-	{
-		var entry = node.Value;
-		var next = node.Next;
-		var prev = node.Previous;
-
-		if(next is { Value: { FileId: null } nv })
-		{
-			if(prev is { Value: { FileId: null } pv })
-			{
-				prev.Value = new(null, pv.Length + nv.Length + entry.Length);
-				entries.Remove(node);
-				entries.Remove(next);
-			}
-			else
-			{
-				node.Value = new(null, nv.Length + entry.Length);
-				entries.Remove(next);
-			}
-		}
-		else if(prev is { Value: { FileId: null } pv })
-		{
-			prev.Value = new(null, pv.Length + entry.Length);
-			entries.Remove(node);
-		}
-		else
-		{
-			node.Value = new(null, entry.Length);
-		}
-	}
-
 	static long CalcChecksum(LinkedList<Entry> entries)
 	{
+		static void UpdateChecksum(ref long checksum, long offset, int file, int len)
+			=> checksum += file * (len * offset + ((len - 1) * len / 2));
+
 		var checksum = 0L;
-		var offset = 0L;
+		var offset   = 0L;
 		foreach(var entry in entries)
 		{
 			if(entry.FileId.HasValue)
 			{
-				var file = entry.FileId.Value;
-				for(int j = 0; j < entry.Length; ++j)
-				{
-					checksum += file * (offset + j);
-				}
+				UpdateChecksum(ref checksum, offset, entry.FileId.Value, entry.Length);
 			}
 			offset += entry.Length;
 		}
@@ -151,12 +119,39 @@ public sealed class Day09SolutionPart1 : Day09Solution
 
 public sealed class Day09SolutionPart2 : Day09Solution
 {
+	static void FreeSpace(LinkedList<Entry> entries, LinkedListNode<Entry> node)
+	{
+		var entry = node.Value;
+		if(node.Next is { Value: { FileId: null } nv } next)
+		{
+			if(node.Previous is { Value: { FileId: null } pv } prev)
+			{
+				prev.Value = new(null, pv.Length + nv.Length + entry.Length);
+				entries.Remove(node);
+				entries.Remove(next);
+			}
+			else
+			{
+				node.Value = new(null, nv.Length + entry.Length);
+				entries.Remove(next);
+			}
+		}
+		else if(node.Previous is { Value: { FileId: null } pv } prev)
+		{
+			prev.Value = new(null, pv.Length + entry.Length);
+			entries.Remove(node);
+		}
+		else
+		{
+			node.Value = new(null, entry.Length);
+		}
+	}
+
 	static LinkedListNode<Entry>? FindFreeSpace(LinkedList<Entry> entries, LinkedListNode<Entry>? upTo, int atLeast)
 	{
 		var node = entries.First;
-		while(node is not null)
+		while(node is not null && node != upTo)
 		{
-			if(node == upTo) break;
 			var entry = node.Value;
 			if(!entry.FileId.HasValue && entry.Length >= atLeast)
 			{
@@ -170,15 +165,10 @@ public sealed class Day09SolutionPart2 : Day09Solution
 	static void TakeSpace(LinkedList<Entry> entries, LinkedListNode<Entry> free, Entry entry)
 	{
 		var freeEntry = free.Value;
-		if(freeEntry.Length == entry.Length)
+		free.Value = new(entry.FileId, entry.Length);
+		if(freeEntry.Length > entry.Length)
 		{
-			free.Value = new(entry.FileId, entry.Length);
-		}
-		else
-		{
-			var extra = new Entry(null, freeEntry.Length - entry.Length);
-			free.Value = new(entry.FileId, entry.Length);
-			entries.AddAfter(free, extra);
+			entries.AddAfter(free, new Entry(null, freeEntry.Length - entry.Length));
 		}
 	}
 
