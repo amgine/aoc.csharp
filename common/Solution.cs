@@ -5,6 +5,19 @@ namespace AoC;
 
 public abstract class Solution
 {
+	protected static List<Point2D> FindPositions<T>(T[,] map, Predicate<T> predicate)
+	{
+		var list = new List<Point2D>();
+		for(int y = 0; y < map.GetLength(0); ++y)
+		{
+			for(int x = 0; x < map.GetLength(1); ++x)
+			{
+				if(predicate(map[y, x])) list.Add(new(x, y));
+			}
+		}
+		return list;
+	}
+
 	protected static char[,] LoadCharMap2D(TextReader reader)
 	{
 		var lines = LoadInputAsListOfNonEmptyStrings(reader);
