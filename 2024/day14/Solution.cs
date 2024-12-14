@@ -72,16 +72,16 @@ public sealed class Day14SolutionPart2 : Day14Solution
 		var boxSize = new Size2D(101, 103);
 		var unique  = new HashSet<Point2D>(capacity: robots.Count);
 		var time    = 0;
-		while(true)
+		do
 		{
 			++time;
+			unique.Clear();
 			foreach(var robot in robots)
 			{
-				unique.Add(robot.GetPosition(time, boxSize));
+				if(!unique.Add(robot.GetPosition(time, boxSize))) break;
 			}
-			if(unique.Count == robots.Count) break;
-			unique.Clear();
 		}
+		while(unique.Count != robots.Count);
 		return time.ToString();
 	}
 }
