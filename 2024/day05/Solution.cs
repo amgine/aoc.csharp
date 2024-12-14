@@ -1,5 +1,4 @@
-﻿
-namespace AoC.Year2024;
+﻿namespace AoC.Year2024;
 
 /// <remarks><a href="https://adventofcode.com/2024/day/5"/></remarks>
 [Name(@"Print Queue")]
@@ -38,17 +37,17 @@ public abstract class Day05Solution : Solution
 		{
 			if(string.IsNullOrEmpty(line))
 			{
-				if(deps)
-				{
-					deps = false;
-				}
+				if(deps) deps = false;
 				continue;
 			}
 
 			if(deps)
 			{
-				var p = line.Split('|');
-				input.Rules.Add(new(int.Parse(p[0]), int.Parse(p[1])));
+				var i0 = line.IndexOf('|');
+				if(i0 < 0) throw new InvalidDataException();
+				input.Rules.Add(new(
+					int.Parse(line.AsSpan(0, i0)),
+					int.Parse(line.AsSpan(i0 + 1))));
 			}
 			else
 			{

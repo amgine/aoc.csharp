@@ -14,9 +14,11 @@ public abstract class Day01Solution : Solution
 		while((line = reader.ReadLine()) is not null)
 		{
 			if(string.IsNullOrEmpty(line)) continue;
-			var p = line.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-			left.Add(int.Parse(p[0], CultureInfo.InvariantCulture));
-			right.Add(int.Parse(p[1], CultureInfo.InvariantCulture));
+			var i0 = line.IndexOf(' ');
+			var s0 = line.AsSpan(0, i0);
+			var s1 = line.AsSpan(i0 + 1).Trim();
+			left.Add (int.Parse(s0, CultureInfo.InvariantCulture));
+			right.Add(int.Parse(s1, CultureInfo.InvariantCulture));
 		}
 
 		return Solve(left, right).ToString(CultureInfo.InvariantCulture);
@@ -32,32 +34,28 @@ public sealed class Day01SolutionPart1 : Day01Solution
 		left.Sort();
 		right.Sort();
 
-		var sum = 0L;
-		for(int i = 0; i < left.Count; ++i)
-		{
-			sum += Math.Abs(left[i] - right[i]);
-		}
-		return sum;
+		return left.Zip(right, static (a, b) => Math.Abs(a - b)).Sum();
 	}
 }
 
 public sealed class Day01SolutionPart2 : Day01Solution
 {
-	private static Dictionary<int, int> GetCounts(List<int> right)
+	private static Dictionary<T, int> GetCounts<T>(List<T> values)
+		where T : notnull
 	{
-		var d = new Dictionary<int, int>(capacity: right.Count);
-		foreach(var n in right)
+		var counts = new Dictionary<T, int>(capacity: values.Count);
+		foreach(var value in values)
 		{
-			if(d.TryGetValue(n, out var count))
+			if(counts.TryGetValue(value, out var count))
 			{
-				d[n] = count + 1;
+				counts[value] = count + 1;
 			}
 			else
 			{
-				d.Add(n, 1);
+				counts.Add(value, 1);
 			}
 		}
-		return d;
+		return counts;
 	}
 
 	protected override long Solve(List<int> left, List<int> right)

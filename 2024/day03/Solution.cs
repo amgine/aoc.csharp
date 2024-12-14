@@ -6,9 +6,7 @@ public abstract class Day03Solution : Solution
 {
 	static bool TryParseInteger(ref ReadOnlySpan<char> text, out long value)
 	{
-		static bool IsDigit(char c) => c is >= '0' and <= '9';
-
-		if(text.Length == 0 || !IsDigit(text[0]))
+		if(text.Length == 0 || !char.IsAsciiDigit(text[0]))
 		{
 			value = 0;
 			return false;
@@ -20,7 +18,7 @@ public abstract class Day03Solution : Solution
 			value += text[0] - '0';
 			text = text[1..];
 		}
-		while(text.Length != 0 && IsDigit(text[0]));
+		while(text.Length != 0 && char.IsAsciiDigit(text[0]));
 		return true;
 	}
 

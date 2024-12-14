@@ -13,34 +13,34 @@ public abstract class Day13Solution : Solution
 		var t = reader.ReadLine();
 		reader.ReadLine();
 
-		if(a is null || b is null || t is null) goto end;
+		if(a is null || b is null || t is null)
+		{
+			input = default;
+			return false;
+		}
 
 		static Vector2D ParseVector(string line)
 		{
 			var i0 = line.IndexOf("X+");
-			var i1 = line.IndexOf(",");
-			var i3 = line.IndexOf("Y+");
+			var i1 = line.IndexOf(",",  i0 + 2);
+			var i2 = line.IndexOf("Y+", i1 + 1);
 			return new(
 				int.Parse(line.AsSpan(i0 + 2, i1 - (i0 + 2))),
-				int.Parse(line.AsSpan(i3 + 2)));
+				int.Parse(line.AsSpan(i2 + 2)));
 		}
 
 		static Point2D ParsePoint(string line)
 		{
 			var i0 = line.IndexOf("X=");
-			var i1 = line.IndexOf(",");
-			var i3 = line.IndexOf("Y=");
+			var i1 = line.IndexOf(",",  i0 + 2);
+			var i2 = line.IndexOf("Y=", i1 + 1);
 			return new(
 				int.Parse(line.AsSpan(i0 + 2, i1 - (i0 + 2))),
-				int.Parse(line.AsSpan(i3 + 2)));
+				int.Parse(line.AsSpan(i2 + 2)));
 		}
 
 		input = new Input(ParseVector(a), ParseVector(b), ParsePoint(t));
 		return true;
-
-		end:
-		input = default;
-		return false;
 	}
 
 	protected static long GetScore(long targetX, long targetY, Vector2D a, Vector2D b)
