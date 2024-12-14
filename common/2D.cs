@@ -489,6 +489,9 @@ public readonly record struct Size2D(int Width, int Height)
 
 	public static Size2D operator *(Size2D a, int b)
 		=> new(a.Width * b, a.Height * b);
+
+	public static Size2D operator /(Size2D a, int b)
+		=> new(a.Width / b, a.Height / b);
 }
 
 public static class Display2D

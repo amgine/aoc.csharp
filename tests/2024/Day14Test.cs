@@ -25,6 +25,6 @@ class Day14Test
 	public void SolvePart1()
 	{
 		var input = new StringReader(SampleInput1);
-		Assert.That(Day14SolutionPart1.Solve(input, 11, 7), Is.EqualTo(12));
+		Assert.That(Day14SolutionPart1.Solve(input, new(11, 7)), Is.EqualTo(12));
 	}
 }

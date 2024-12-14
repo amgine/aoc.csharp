@@ -4,21 +4,21 @@
 [Name(@"Restroom Redoubt")]
 public abstract class Day14Solution : Solution
 {
-	protected static Point2D Move(Point2D position, Vector2D velocity, int time, int w, int h)
-	{
-		static int Constrain(int value, int max)
-		{
-			if(value >= max) return value % max;
-			if(value < 0)    return value + ((-value + max - 1) / max * max);
-			return value;
-		}
-
-		position += velocity * time;
-		return new(Constrain(position.X, w), Constrain(position.Y, h));
-	}
-
 	protected readonly record struct Robot(Point2D Position, Vector2D Velocity)
 	{
+		public Point2D GetPosition(int time, Size2D boxSize)
+		{
+			static int Constrain(int value, int max)
+			{
+				if(value >= max) return value % max;
+				if(value < 0)    return value + ((-value + max - 1) / max * max);
+				return value;
+			}
+
+			var position = Position + Velocity * time;
+			return new(Constrain(position.X, boxSize.Width), Constrain(position.Y, boxSize.Height));
+		}
+
 		public static Robot Parse(string line)
 		{
 			var i0 = line.IndexOf("p=");
@@ -33,11 +33,11 @@ public abstract class Day14Solution : Solution
 
 public sealed class Day14SolutionPart1 : Day14Solution
 {
-	public static int Solve(TextReader reader, int w, int h)
+	public static int Solve(TextReader reader, Size2D boxSize)
 	{
 		var robots = LoadListFromNonEmptyStrings(reader, Robot.Parse);
 
-		var qs = new Size2D(w / 2, h / 2);
+		var qs = boxSize / 2;
 		var r0 = new Rectangle2D(new(0, 0), qs);
 		var r1 = new Rectangle2D(new(qs.Width + 1, 0), qs);
 		var r2 = new Rectangle2D(new(0, qs.Height + 1), qs);
@@ -50,7 +50,7 @@ public sealed class Day14SolutionPart1 : Day14Solution
 
 		foreach(var robot in robots)
 		{
-			var pos = Move(robot.Position, robot.Velocity, 100, w, h);
+			var pos = robot.GetPosition(100, boxSize);
 			if(pos.IsInside(r0)) ++c0;
 			if(pos.IsInside(r1)) ++c1;
 			if(pos.IsInside(r2)) ++c2;
@@ -61,29 +61,25 @@ public sealed class Day14SolutionPart1 : Day14Solution
 	}
 
 	public override string Process(TextReader reader)
-		=> Solve(reader, 101, 103).ToString();
+		=> Solve(reader, new(101, 103)).ToString();
 }
 
 public sealed class Day14SolutionPart2 : Day14Solution
 {
 	public override string Process(TextReader reader)
 	{
-		var robots = LoadListFromNonEmptyStrings(reader, Robot.Parse);
-
-		const int w = 101;
-		const int h = 103;
-
-		var unique = new HashSet<Point2D>(capacity: robots.Count);
-		var time = 1;
+		var robots  = LoadListFromNonEmptyStrings(reader, Robot.Parse);
+		var boxSize = new Size2D(101, 103);
+		var unique  = new HashSet<Point2D>(capacity: robots.Count);
+		var time    = 0;
 		while(true)
 		{
+			++time;
 			foreach(var robot in robots)
 			{
-				unique.Add(Move(robot.Position, robot.Velocity, time, w, h));
+				unique.Add(robot.GetPosition(time, boxSize));
 			}
-
 			if(unique.Count == robots.Count) break;
-			++time;
 			unique.Clear();
 		}
 		return time.ToString();
