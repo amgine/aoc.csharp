@@ -10,13 +10,14 @@ public abstract class Day14Solution : Solution
 		{
 			static int Constrain(int value, int max)
 			{
-				if(value >= max) return value % max;
-				if(value < 0)    return value + ((-value + max - 1) / max * max);
-				return value;
+				value %= max;
+				return value >= 0 ? value : value + max;
 			}
 
 			var position = Position + Velocity * time;
-			return new(Constrain(position.X, boxSize.Width), Constrain(position.Y, boxSize.Height));
+			return new(
+				X: Constrain(position.X, boxSize.Width),
+				Y: Constrain(position.Y, boxSize.Height));
 		}
 
 		public static Robot Parse(string line)
