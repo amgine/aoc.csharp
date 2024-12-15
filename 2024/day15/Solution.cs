@@ -4,75 +4,22 @@
 [Name(@"Warehouse Woes")]
 public abstract class Day15Solution : Solution
 {
-	protected static Point2D FindStartingPosition(char[,] map)
+	protected record class Input(char[,] Map, Queue<Vector2D> Instructions);
+
+	protected virtual char[,] CreateMap(List<string> lines)
 	{
-		for(int y = 0; y < map.GetLength(0); ++y)
+		var map = new char[lines.Count, lines[0].Length];
+		for(int y = 0; y < lines.Count; ++y)
 		{
-			for(int x = 0; x < map.GetLength(1); ++x)
+			for(int x = 0; x < lines[y].Length; ++x)
 			{
-				if(map[y, x] is '@')
-				{
-					map[y, x] = '.';
-					return new(x, y);
-				}
+				map[y, x] = lines[y][x];
 			}
 		}
-		throw new InvalidDataException();
-	}
-}
-
-public sealed class Day15SolutionPart1 : Day15Solution
-{
-	private static void Execute(char[,] map, Queue<Vector2D> instructions)
-	{
-		var pos = FindStartingPosition(map);
-		while(instructions.TryDequeue(out var instruction))
-		{
-			var next = pos + instruction;
-			if(!next.IsInside(map)) continue;
-			var v = next.GetValue(map);
-			if(v == '.')
-			{
-				pos = next;
-			}
-			else if(v == 'O')
-			{
-				var nn = next + instruction;
-				while(nn.IsInside(map) && nn.GetValue(map) == 'O')
-				{
-					nn += instruction;
-				}
-				if(nn.IsInside(map) && nn.GetValue(map) == '.')
-				{
-					nn.GetValue(map) = 'O';
-					next.GetValue(map) = '.';
-					pos = next;
-				}
-			}
-			else if(v == '#')
-			{
-				continue;
-			}
-		}
+		return map;
 	}
 
-	private static long GetScore(char[,] map)
-	{
-		var sum = 0L;
-		for(int y = 0; y < map.GetLength(0); ++y)
-		{
-			for(int x = 0; x < map.GetLength(1); ++x)
-			{
-				if(map[y, x] is 'O')
-				{
-					sum += y * 100 + x;
-				}
-			}
-		}
-		return sum;
-	}
-
-	public override string Process(TextReader reader)
+	private Input ReadInput(TextReader reader)
 	{
 		Queue<Vector2D> instructions = new();
 
@@ -105,54 +52,113 @@ public sealed class Day15SolutionPart1 : Day15Solution
 				lines.Add(line);
 			}
 		}
-		var map = new char[lines.Count, lines[0].Length];
-		for(int y = 0; y < lines.Count; ++y)
+
+		return new(CreateMap(lines), instructions);
+	}
+
+	protected static long GetScore(char[,] map, char box)
+	{
+		var sum = 0L;
+		for(int y = 0; y < map.GetLength(0); ++y)
 		{
-			for(int x = 0; x < lines[y].Length; ++x)
+			for(int x = 0; x < map.GetLength(1); ++x)
 			{
-				map[y, x] = lines[y][x];
+				if(map[y, x] == box)
+				{
+					sum += y * 100 + x;
+				}
 			}
 		}
-		Execute(map, instructions);
-		return GetScore(map).ToString();
+		return sum;
+	}
+
+	protected abstract long Solve(Input input);
+
+	protected static Point2D FindStartingPosition(char[,] map)
+	{
+		for(int y = 0; y < map.GetLength(0); ++y)
+		{
+			for(int x = 0; x < map.GetLength(1); ++x)
+			{
+				if(map[y, x] is '@')
+				{
+					map[y, x] = '.';
+					return new(x, y);
+				}
+			}
+		}
+		throw new InvalidDataException();
+	}
+
+	public sealed override string Process(TextReader reader)
+		=> Solve(ReadInput(reader)).ToString();
+}
+
+public sealed class Day15SolutionPart1 : Day15Solution
+{
+	private static void Execute(Input input)
+	{
+		var map = input.Map;
+		var pos = FindStartingPosition(map);
+		while(input.Instructions.TryDequeue(out var v))
+		{
+			var next = pos + v;
+			if(!next.IsInside(map)) continue;
+			switch(next.GetValue(map))
+			{
+				case '#': continue;
+				case '.': pos = next; continue;
+				case 'O':
+					var nn = next + v;
+					while(nn.IsInside(map) && nn.GetValue(map) == 'O')
+					{
+						nn += v;
+					}
+					if(nn.IsInside(map) && nn.GetValue(map) == '.')
+					{
+						nn.GetValue(map) = 'O';
+						next.GetValue(map) = '.';
+						pos = next;
+					}
+					break;
+				default: throw new InvalidDataException();
+			}
+		}
+	}
+
+	protected override long Solve(Input input)
+	{
+		Execute(input);
+		return GetScore(input.Map, 'O');
 	}
 }
 
 public sealed class Day15SolutionPart2 : Day15Solution
 {
-	static char[,] Expand(char[,] map)
+	protected override char[,] CreateMap(List<string> lines)
 	{
-		var expanded = new char[map.GetLength(0), map.GetLength(1) * 2];
-		for(int y = 0; y < map.GetLength(0); ++y)
-		{
-			for(int x = 0; x < map.GetLength(1); ++x)
+		static (char, char) Expand(char v) =>
+			v switch
 			{
-				switch(map[y, x])
-				{
-					case '@':
-						expanded[y, x * 2 + 0] = '@';
-						expanded[y, x * 2 + 1] = '.';
-						break;
-					case '.':
-						expanded[y, x * 2 + 0] = '.';
-						expanded[y, x * 2 + 1] = '.';
-						break;
-					case '#':
-						expanded[y, x * 2 + 0] = '#';
-						expanded[y, x * 2 + 1] = '#';
-						break;
-					case 'O':
-						expanded[y, x * 2 + 0] = '[';
-						expanded[y, x * 2 + 1] = ']';
-						break;
-					default: throw new InvalidDataException();
-				}
+				'@' => ('@', '.'),
+				'.' => ('.', '.'),
+				'#' => ('#', '#'),
+				'O' => ('[', ']'),
+				_ => throw new InvalidDataException(),
+			};
+
+		var map = new char[lines.Count, lines[0].Length * 2];
+		for(int y = 0; y < lines.Count; ++y)
+		{
+			for(int x = 0; x < lines[y].Length; ++x)
+			{
+				(map[y, x * 2 + 0], map[y, x * 2 + 1]) = Expand(lines[y][x]);
 			}
 		}
-		return expanded;
+		return map;
 	}
 
-	private static void Execute(char[,] map, Queue<Vector2D> instructions)
+	private static void Execute(Input input)
 	{
 		static bool TryMoveBoxHorizontal(char[,] map, Point2D p, Vector2D v)
 		{
@@ -166,10 +172,8 @@ public sealed class Day15SolutionPart2 : Day15Solution
 			var (c0, c1) = v.DeltaX > 0 ? ('[', ']') : (']', '[');
 			while(w != n)
 			{
-				w.GetValue(map) = c0;
-				w += v;
-				w.GetValue(map) = c1;
-				w += v;
+				w.GetValue(map) = c0; w += v;
+				w.GetValue(map) = c1; w += v;
 			}
 			return true;
 		}
@@ -226,100 +230,34 @@ public sealed class Day15SolutionPart2 : Day15Solution
 			return true;
 		}
 
+		var map = input.Map;
 		var pos = FindStartingPosition(map);
-		while(instructions.TryDequeue(out var instruction))
+		while(input.Instructions.TryDequeue(out var v))
 		{
-			var next = pos + instruction;
+			var next = pos + v;
 			if(!next.IsInside(map)) continue;
-			var v = next.GetValue(map);
-			if(v == '.')
+			switch(next.GetValue(map))
 			{
-				pos = next;
-			}
-			else if(v is '[' or ']')
-			{
-				if(instruction.DeltaY == 0)
-				{
-					if(TryMoveBoxHorizontal(map, pos, instruction))
+				case '#': continue;
+				case '.': pos = next; continue;
+				case '[' or ']':
+					if(v.DeltaY == 0)
 					{
-						pos = next;
+						if(TryMoveBoxHorizontal(map, pos, v)) pos = next;
 					}
-				}
-				else
-				{
-					if(TryMoveBoxVertical(map, pos, instruction))
+					else
 					{
-						pos = next;
+						if(TryMoveBoxVertical(map, pos, v)) pos = next;
 					}
-				}
-			}
-			else if(v == '#')
-			{
-				continue;
-			}
-		}
-	}
-
-	private static long GetScore(char[,] map)
-	{
-		var sum = 0L;
-		for(int y = 0; y < map.GetLength(0); ++y)
-		{
-			for(int x = 0; x < map.GetLength(1); ++x)
-			{
-				if(map[y, x] is '[')
-				{
-					sum += y * 100 + x;
-				}
-			}
-		}
-		return sum;
-	}
-
-	public override string Process(TextReader reader)
-	{
-		Queue<Vector2D> instructions = new();
-
-		var lines = new List<string>();
-		string? line;
-		var isReadingInstructions = false;
-		while((line = reader.ReadLine()) is not null)
-		{
-			if(isReadingInstructions)
-			{
-				for(int i = 0; i < line.Length; ++i)
-				{
-					instructions.Enqueue(line[i] switch
-					{
-						'<' => Vector2D.Left,
-						'^' => Vector2D.Up,
-						'>' => Vector2D.Right,
-						'v' => Vector2D.Down,
-						_ => throw new InvalidDataException(),
-					});
-				}
-			}
-			else
-			{
-				if(line.Length == 0)
-				{
-					isReadingInstructions = true;
 					continue;
-				}
-				lines.Add(line);
+				default: throw new InvalidDataException();
 			}
 		}
-		var map = new char[lines.Count, lines[0].Length];
-		for(int y = 0; y < lines.Count; ++y)
-		{
-			for(int x = 0; x < lines[y].Length; ++x)
-			{
-				map[y, x] = lines[y][x];
-			}
-		}
-		map = Expand(map);
-		Execute(map, instructions);
+	}
 
-		return GetScore(map).ToString();
+	protected override long Solve(Input input)
+	{
+		Execute(input);
+		return GetScore(input.Map, '[');
 	}
 }
