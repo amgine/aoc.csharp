@@ -19,42 +19,38 @@ public abstract class Day15Solution : Solution
 		return map;
 	}
 
-	private Input ReadInput(TextReader reader)
+	private static Queue<Vector2D> ReadInstructions(TextReader reader)
 	{
 		Queue<Vector2D> instructions = new();
-
-		var lines = new List<string>();
-		string? line;
-		var isReadingInstructions = false;
-		while((line = reader.ReadLine()) is not null)
+		while(reader.ReadLine() is { } line)
 		{
-			if(isReadingInstructions)
+			foreach(var c in line)
 			{
-				for(int i = 0; i < line.Length; ++i)
+				instructions.Enqueue(c switch
 				{
-					instructions.Enqueue(line[i] switch
-					{
-						'<' => Vector2D.Left,
-						'^' => Vector2D.Up,
-						'>' => Vector2D.Right,
-						'v' => Vector2D.Down,
-						_ => throw new InvalidDataException(),
-					});
-				}
-			}
-			else
-			{
-				if(line.Length == 0)
-				{
-					isReadingInstructions = true;
-					continue;
-				}
-				lines.Add(line);
+					'<' => Vector2D.Left,
+					'^' => Vector2D.Up,
+					'>' => Vector2D.Right,
+					'v' => Vector2D.Down,
+					_ => throw new InvalidDataException(),
+				});
 			}
 		}
-
-		return new(CreateMap(lines), instructions);
+		return instructions;
 	}
+
+	private char[,] ReadMap(TextReader reader)
+	{
+		var lines = new List<string>();
+		while(reader.ReadLine() is { Length: not 0 } line)
+		{
+			lines.Add(line);
+		}
+		return CreateMap(lines);
+	}
+
+	private Input ReadInput(TextReader reader)
+		=> new(ReadMap(reader), ReadInstructions(reader));
 
 	protected static long GetScore(char[,] map, char box)
 	{
@@ -163,24 +159,22 @@ public sealed class Day15SolutionPart2 : Day15Solution
 		static bool TryMoveBoxHorizontal(char[,] map, Point2D p, Vector2D v)
 		{
 			var n = p + v;
-			while(n.GetValue(map) is '[' or ']') n += v;
+			var (c0, c1) = v.DeltaX > 0 ? ('[', ']') : (']', '[');
+			while(n.GetValue(map) == c0)
+			{
+				n += v;
+				n += v;
+			}
 			if(n.GetValue(map) is '#') return false;
 			var w = p + v;
 			w.GetValue(map) = '.';
-			w += v;
-			n += v;
-			var (c0, c1) = v.DeltaX > 0 ? ('[', ']') : (']', '[');
-			while(w != n)
+			do
 			{
-				w.GetValue(map) = c0; w += v;
-				w.GetValue(map) = c1; w += v;
+				(w += v).GetValue(map) = c0;
+				(w += v).GetValue(map) = c1;
 			}
+			while(w != n);
 			return true;
-		}
-
-		static bool IsFree(char[,] map, Point2D n0, Point2D n1)
-		{
-			return n0.GetValue(map) == '.' && n1.GetValue(map) == '.';
 		}
 
 		static bool CanMoveVertical(char[,] map, Point2D p, Vector2D v)
@@ -200,27 +194,24 @@ public sealed class Day15SolutionPart2 : Day15Solution
 		static void MoveBoxVertical(char[,] map, Point2D p, Vector2D v)
 		{
 			var n0 = p + v;
-			var b0 = n0.GetValue(map);
 			Point2D n1;
-			if(b0 == '[')
+			switch(n0.GetValue(map))
 			{
-				n1 = n0 + Vector2D.Right;
+				case '[':
+					n1 = n0 + Vector2D.Right;
+					break;
+				case ']':
+					n1 = n0 + Vector2D.Left;
+					(n0, n1) = (n1, n0);
+					break;
+				default: return;
 			}
-			else if(b0 == ']')
-			{
-				n1 = n0 + Vector2D.Left;
-				(n0, n1) = (n1, n0);
-			}
-			else return;
-			if(!IsFree(map, n0 + v, n1 + v))
-			{
-				MoveBoxVertical(map, n0, v);
-				MoveBoxVertical(map, n1, v);
-			}
-			(n0 + v).GetValue(map) = '[';
-			(n1 + v).GetValue(map) = ']';
-			n0.GetValue(map) = '.';
-			n1.GetValue(map) = '.';
+			var n0n = n0 + v;
+			var n1n = n1 + v;
+			if(n0n.GetValue(map) != '.') MoveBoxVertical(map, n0, v);
+			if(n1n.GetValue(map) != '.') MoveBoxVertical(map, n1, v);
+			(n0n.GetValue(map), n1n.GetValue(map)) = ('[', ']');
+			(n0 .GetValue(map), n1 .GetValue(map)) = ('.', '.');
 		}
 
 		static bool TryMoveBoxVertical(char[,] map, Point2D p, Vector2D v)
