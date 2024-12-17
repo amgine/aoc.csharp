@@ -6,30 +6,40 @@ public abstract class Day16Solution : Solution
 {
 	protected sealed class Path(Point2D position, Direction2D direction = Direction2D.Right)
 	{
+		public static Path CreateInitial(Point2D position)
+		{
+			var path = new Path(position);
+			path.Nodes.Add(position);
+			return path;
+		}
+
 		public Point2D Position { get; private set; } = position;
 
 		public Direction2D Direction { get; private set; } = direction;
 
-		public Dictionary<Point2D, long> Scores { get; } = [];
+		public HashSet<Point2D> Nodes { get; } = [];
 
 		public long Score { get; private set; }
 
 		public bool Visited(Point2D position)
-			=> Scores.ContainsKey(position);
+			=> Nodes.Contains(position);
 
 		public void Move(Direction2D direction)
 		{
+			const int MoveCost = 1;
+			const int TurnCost = 1000;
+
 			Position += Vector2D.FromDirection(direction);
 			if(Direction == direction)
 			{
-				Score += 1;
+				Score += MoveCost;
 			}
 			else
 			{
 				Direction  = direction;
-				Score     += 1001;
+				Score     += MoveCost + TurnCost;
 			}
-			Scores.Add(Position, Score);
+			Nodes.Add(Position);
 		}
 
 		public Path Fork(Direction2D direction)
@@ -38,10 +48,7 @@ public abstract class Day16Solution : Solution
 			{
 				Score = Score,
 			};
-			foreach(var kvp in Scores)
-			{
-				p.Scores.Add(kvp.Key, kvp.Value);
-			}
+			p.Nodes.UnionWith(Nodes);
 			p.Move(direction);
 			return p;
 		}
@@ -65,14 +72,11 @@ public abstract class Day16Solution : Solution
 
 	protected static long GetBestScore(char[,] map, Point2D s, Point2D e)
 	{
-		var path = new Path(s);
-		path.Scores.Add(s, 0);
-
-		var bestScore = long.MaxValue;
-		var bestScores = new Dictionary<Point2D, long>();
-		var paths = new Queue<Path>();
-		paths.Enqueue(path);
-		var iterator = new PathIterator(map, paths);
+		var bestScore  = long.MaxValue;
+		var bestScores = new Dictionary<Point2D, long>(capacity: map.Length);
+		var paths      = new Queue<Path>();
+		var iterator   = new PathIterator(map, paths);
+		paths.Enqueue(Path.CreateInitial(s));
 		while(paths.TryDequeue(out var p))
 		{
 			if(p.Position == e)
@@ -100,7 +104,12 @@ public abstract class Day16Solution : Solution
 		private readonly List<Direction2D> _candidates = new(capacity: 3);
 		private readonly List<Path>        _nextpaths  = new(capacity: 3);
 
-		public void Next(Path p)
+		private bool CanVisit(Path p, Point2D position)
+			=> position.IsInside(map)
+			&& position.GetValue(map) != '#'
+			&& !p.Visited(position);
+
+		private void GetNextDirections(Path p)
 		{
 			var d0 = p.Direction;
 			var d1 = d0.RotateCW();
@@ -110,34 +119,32 @@ public abstract class Day16Solution : Solution
 			var p1 = p.Position + Vector2D.FromDirection(d1);
 			var p2 = p.Position + Vector2D.FromDirection(d2);
 
-			if(p0.IsInside(map) && p0.GetValue(map) != '#' && !p.Visited(p0))
-			{
-				_candidates.Add(d0);
-			}
-			if(p1.IsInside(map) && p1.GetValue(map) != '#' && !p.Visited(p1))
-			{
-				_candidates.Add(d1);
-			}
-			if(p2.IsInside(map) && p2.GetValue(map) != '#' && !p.Visited(p2))
-			{
-				_candidates.Add(d2);
-			}
+			_candidates.Clear();
+			if(CanVisit(p, p0)) _candidates.Add(d0);
+			if(CanVisit(p, p1)) _candidates.Add(d1);
+			if(CanVisit(p, p2)) _candidates.Add(d2);
+		}
 
-			if(_candidates.Count != 0)
+		private void ScheduleMoves(Path p)
+		{
+			if(_candidates.Count == 0) return;
+			_nextpaths.Add(p);
+			for(int i = 1; i < _candidates.Count; ++i)
 			{
-				_nextpaths.Add(p);
-				for(int i = 1; i < _candidates.Count; ++i)
-				{
-					_nextpaths.Add(p.Fork(_candidates[i]));
-				}
-				p.Move(_candidates[0]);
-				foreach(var n in _nextpaths)
-				{
-					paths.Enqueue(n);
-				}
-				_nextpaths.Clear();
-				_candidates.Clear();
+				_nextpaths.Add(p.Fork(_candidates[i]));
 			}
+			p.Move(_candidates[0]);
+			foreach(var n in _nextpaths)
+			{
+				paths.Enqueue(n);
+			}
+			_nextpaths.Clear();
+		}
+
+		public void Next(Path p)
+		{
+			GetNextDirections(p);
+			ScheduleMoves(p);
 		}
 	}
 }
@@ -162,26 +169,24 @@ public sealed class Day16SolutionPart2 : Day16Solution
 		var s   = FindPosition(map, 'S');
 		var e   = FindPosition(map, 'E');
 
-		var path = new Path(s);
-		path.Scores.Add(s, 0);
-
 		var bestScore  = GetBestScore(map, s, e);
 		var bestScores = new Dictionary<(Point2D, Direction2D), long>();
 		var paths      = new Queue<Path>();
 		var iterator   = new PathIterator(map, paths);
 		var sitPlaces  = new HashSet<Point2D> { s, e };
-		paths.Enqueue(path);
+		paths.Enqueue(Path.CreateInitial(s));
 		while(paths.TryDequeue(out var p))
 		{
 			if(p.Position == e)
 			{
 				if(p.Score == bestScore)
 				{
-					sitPlaces.UnionWith(p.Scores.Keys);
+					sitPlaces.UnionWith(p.Nodes);
 				}
 				continue;
 			}
-			if(p.Score >= bestScore || bestScores.TryGetValue((p.Position, p.Direction), out var bs) && bs < p.Score)
+			if(p.Score >= bestScore) continue;
+			if(bestScores.TryGetValue((p.Position, p.Direction), out var bs) && bs < p.Score)
 			{
 				continue;
 			}
