@@ -18,6 +18,19 @@ public abstract class Solution
 		return list;
 	}
 
+	protected static Point2D FindPosition<T>(T[,] map, T value)
+		where T : IEqualityOperators<T, T, bool>
+	{
+		for(int y = 0; y < map.GetLength(0); ++y)
+		{
+			for(int x = 0; x < map.GetLength(0); ++x)
+			{
+				if(map[y, x] == value) return new(x, y);
+			}
+		}
+		throw new InvalidDataException();
+	}
+
 	protected static char[,] LoadCharMap2D(TextReader reader)
 	{
 		var lines = LoadInputAsListOfNonEmptyStrings(reader);
