@@ -23,7 +23,7 @@ public abstract class Solution
 	{
 		for(int y = 0; y < map.GetLength(0); ++y)
 		{
-			for(int x = 0; x < map.GetLength(0); ++x)
+			for(int x = 0; x < map.GetLength(1); ++x)
 			{
 				if(map[y, x] == value) return new(x, y);
 			}
