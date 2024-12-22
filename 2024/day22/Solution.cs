@@ -43,12 +43,6 @@ public sealed class Day22SolutionPart1 : Day22Solution
 
 public sealed class Day22SolutionPart2 : Day22Solution
 {
-	static int MakeKey(ReadOnlySpan<sbyte> diffs)
-		=> ((int)((byte)diffs[0]) << 24)
-		 | ((int)((byte)diffs[1]) << 16)
-		 | ((int)((byte)diffs[2]) <<  8)
-		 | ((int)((byte)diffs[3]) <<  0);
-
 	private static void Add<TKey, TValue>(Dictionary<TKey, TValue> prices, TKey key, TValue value)
 		where TKey   : notnull
 		where TValue : System.Numerics.IAdditionOperators<TValue, TValue, TValue>
@@ -63,22 +57,12 @@ public sealed class Day22SolutionPart2 : Day22Solution
 		}
 	}
 
-	private static void AddDiff<T>(Span<T> diffs, T diff)
-	{
-		for(int d = 0; d < diffs.Length - 1; ++d)
-		{
-			diffs[d] = diffs[d + 1];
-		}
-		diffs[^1] = diff;
-	}
-
 	private static int GetPrice(long number) => (int)(number % 10);
 
 	public override string Process(TextReader reader)
 	{
-		Span<sbyte> diffs = stackalloc sbyte[4];
 		string? line;
-
+		int key;
 		var prices = new Dictionary<int, int>();
 		var unique = new HashSet<int>();
 		while((line = reader.ReadLine()) is not null)
@@ -87,20 +71,16 @@ public sealed class Day22SolutionPart2 : Day22Solution
 			var number    = long.Parse(line);
 			int prevPrice = GetPrice(number);
 			unique.Clear();
-			diffs.Clear();
+			key = 0;
 			for(int i = 0; i < Iterations; ++i)
 			{
-				number    = Next(number);
-				var price = GetPrice(number);
-				AddDiff(diffs, (sbyte)(price - prevPrice));
+				var price = GetPrice(number = Next(number));
+				key <<= 8;
+				key  |= (byte)(sbyte)(price - prevPrice);
 				prevPrice = price;
-				if(i >= 3)
+				if(i >= 3 && unique.Add(key))
 				{
-					var key = MakeKey(diffs);
-					if(unique.Add(key))
-					{
-						Add(prices, key, price);
-					}
+					Add(prices, key, price);
 				}
 			}
 		}
