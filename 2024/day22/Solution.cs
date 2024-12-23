@@ -43,21 +43,27 @@ public sealed class Day22SolutionPart1 : Day22Solution
 
 public sealed class Day22SolutionPart2 : Day22Solution
 {
-	private static void Add<TKey, TValue>(Dictionary<TKey, TValue> prices, TKey key, TValue value)
+	private static TValue Add<TKey, TValue>(Dictionary<TKey, TValue> values, TKey key, TValue value)
 		where TKey   : notnull
 		where TValue : System.Numerics.IAdditionOperators<TValue, TValue, TValue>
 	{
-		if(prices.TryGetValue(key, out var p))
+		if(values.TryGetValue(key, out var p))
 		{
-			prices[key] = p + value;
+			value += p;
+			values[key] = value;
 		}
 		else
 		{
-			prices.Add(key, value);
+			values.Add(key, value);
 		}
+		return value;
 	}
 
-	private static int GetPrice(long number) => (int)(number % 10);
+	private static int GetPrice(long number)
+		=> (int)(number % 10);
+
+	private static int AddDiff(int key, int price, int prevPrice)
+		=> (key << 8) | (byte)(price - prevPrice);
 
 	public override string Process(TextReader reader)
 	{
@@ -65,6 +71,7 @@ public sealed class Day22SolutionPart2 : Day22Solution
 		int key;
 		var prices = new Dictionary<int, int>();
 		var unique = new HashSet<int>();
+		var max    = 0;
 		while((line = reader.ReadLine()) is not null)
 		{
 			if(line.Length == 0) continue;
@@ -75,16 +82,15 @@ public sealed class Day22SolutionPart2 : Day22Solution
 			for(int i = 0; i < Iterations; ++i)
 			{
 				var price = GetPrice(number = Next(number));
-				key <<= 8;
-				key  |= (byte)(sbyte)(price - prevPrice);
+				key       = AddDiff(key, price, prevPrice);
 				prevPrice = price;
 				if(i >= 3 && unique.Add(key))
 				{
-					Add(prices, key, price);
+					var sum = Add(prices, key, price);
+					if(sum > max) max = sum;
 				}
 			}
 		}
-
-		return prices.Values.Max().ToString();
+		return max.ToString();
 	}
 }
