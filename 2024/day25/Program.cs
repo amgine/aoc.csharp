@@ -2,5 +2,5 @@
 
 internal class Program
 {
-	static void Main(string[] args) => Solution.Run<Day25SolutionPart1, Day25SolutionPart2>();
+	static void Main(string[] args) => Solution.Run<Day25SolutionPart1>(partNumber: 1);
 }
