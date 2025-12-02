@@ -3,7 +3,7 @@
 namespace AoC.Year2025;
 
 [TestFixture]
-class Day05Test
+class Day01Test
 {
 	const string SampleInput1 =
 		"""
