@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>AoC.Year2025</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\inputs\day02.txt" Link="input.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\outputs\day02.txt" Link="correct.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
