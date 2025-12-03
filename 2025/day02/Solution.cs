@@ -1,7 +1,7 @@
 ﻿namespace AoC.Year2025;
 
 /// <remarks><a href="https://adventofcode.com/2025/day/2"/></remarks>
-[Name(@"X")]
+[Name(@"Gift Shop")]
 public abstract class Day02Solution : Solution
 {
 	protected readonly record struct Range(long Minimum, long Maximum)
