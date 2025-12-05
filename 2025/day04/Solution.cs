@@ -1,5 +1,4 @@
-﻿
-namespace AoC.Year2025;
+﻿namespace AoC.Year2025;
 
 /// <remarks><a href="https://adventofcode.com/2025/day/4"/></remarks>
 [Name(@"Printing Department")]
