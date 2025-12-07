@@ -575,6 +575,7 @@
     <Project Path="2025/day04/2025day04.csproj" />
     <Project Path="2025/day05/2025day05.csproj" />
     <Project Path="2025/day06/2025day06.csproj" />
+    <Project Path="2025/day07/2025day07.csproj" />
   </Folder>
   <Folder Name="/2025/inputs/">
     <File Path="2025/inputs/day01.txt" />
